@@ -1,0 +1,27 @@
+import telebot
+import requests
+print('Start telegram bot...')
+data = requests.get('your token').json()
+euro = data['Valute']['EUR']['Value']    # курс евро-рубль
+dollar = data['Valute']['USD']['Value']  # курс доллар-рубль
+token = '5147733428:AAHJui6mpA1paxBrfMxMnBFxjHy60UOZ8Q8'
+bot = telebot.TeleBot(token)
+@bot.message_handler(commands=['start'])
+def start(message):
+  bot.send_message(message.chat.id, 'I can exchange some values for rubles and conversely\nYou can control me by sending these commands:\n/rubusd - exchange rubles for Unated States Dollars\n/rubeur - exchange rubles for euro\n/usdrub - exchange United States Dollar for rubles\n/eurrub - exchange euro for rubles')
+  bot.send_message(message.chat.id, 'Please use this format:\ncommand number without spaces')
+@bot.message_handler(content_types=['text', 'photo'])
+def values(message):
+  if message.photo:
+    bot.send_message(message.chat.id, 'Клевая фотка))')
+  elif message.text.split()[0] == '/rubusd':
+    bot.send_message(message.chat.id, str(int(message.text.split()[1]) * dollar) + ' United States Dollar')
+  elif message.text.split()[0] == '/rubeur':
+    bot.send_message(message.chat.id, str(int(message.text.split()[1]) * euro) + ' euro')
+  elif message.text.split()[0] == '/usdrub':
+    bot.send_message(message.chat.id,  str(int(message.text.split()[1]) / euro) + ' rubles')
+  elif message.text.split()[0] == '/eurrub':
+    bot.send_message(message.chat.id, str(int(message.text.split()[1]) / dollar) + ' rubles')
+  else:
+    bot.send_message(message.chat.id, message)
+bot.polling(non_stop=True)
