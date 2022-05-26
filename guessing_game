@@ -1,0 +1,56 @@
+import random
+count = 0                                                                          # счетчик попыток для вывода состояния виселицы
+letters = []                                                                       # массив с использованными словами
+gallows = {8:'|-----\n|    O\n|   \|/\n|   /|',                                    # словарь с состояниями виселицы
+           7:'|-----\n|    O\n|   \|/\n|   /',
+           6:'|-----\n|    O\n|   \|/\n|',
+           5:'|-----\n|    O\n|   \|\n|',
+           4:'|-----\n|    O\n|    |\n|',
+           3:'|-----\n|    O\n|   \n|',
+           2:'|-----\n|    \n|   \n|',
+           1:'|\n|\n|\n|'}
+with open('dict.txt', 'r', encoding='utf-8') as file:                              # 'dict.txt' - это локальный фал со словами
+    lines = [i.strip() for i in file.readlines()]
+    word = list(random.choice(lines))                                              # выбор слова
+    lengh = ['_' for i in range(len(word))]                                        # черточки, позволяющие понять, сколько букв в слове, и куда вставляются буквы
+    while True:
+        if lengh == word:
+            print("Вы выиграли!")
+            count = 0
+            letters = []
+            lengh = []
+            break
+        print(*lengh)
+        print('Введите букву')
+        print('Использованные буквы:', *letters)
+        char = input()
+        if char not in letters:
+            letters.append(char)
+        elif char in letters:                                                      # проверка на использование введенной буквы
+            print("Эта буква уже использовалась ранее!")
+            continue
+        if char not in word:
+            count += 1
+            print('Такой буквы нет в загаданном слове!')
+            if count <=8:
+                print(gallows[count])
+            else:
+                print('Вы проиграли!\nЗагаданное слово было:', ''.join(word))
+                count = 0
+                letters = []
+                lengh = []
+                break
+        elif char in word:                                                        # проверка на количество букв в слове
+            print('Правильно!')
+            c = word.count(char)
+            if c == 1:
+                index = word.index(char)
+                lengh.insert(index, char)
+                del lengh[index+1]
+            elif c > 1:
+                w = word.copy()
+                for i in range(c):
+                    index = w.index(char)
+                    lengh.insert(index, char)
+                    del lengh[index + 1]
+                    w.remove(char)
